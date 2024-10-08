@@ -1,0 +1,27 @@
+{
+  "name": "buyers_app",
+  "version": "1.0.0",
+  "description": "API to db of food buyers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noblekuz/kelewele_backend.git"
+  },
+  "keywords": [
+    "kelewele",
+    "client-side"
+  ],
+  "author": "noblekuz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noblekuz/kelewele_backend/issues"
+  },
+  "homepage": "https://github.com/noblekuz/kelewele_backend#readme",
+  "dependencies": {
+    "express": "^4.21.0",
+    "mongoose": "^8.7.0"
+  }
+}
