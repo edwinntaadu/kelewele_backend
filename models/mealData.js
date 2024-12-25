@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const {Schema, model} = require("../conn/connection")
 
-const mealsSchema = mongoose.Schema({
+const mealsSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -25,5 +25,5 @@ const mealsSchema = mongoose.Schema({
     },
 });
 
-var mealsData = mongoose.model('mealsData', mealsSchema);
-module.exports = mealsData;
+const Meals = model('mealsData', mealsSchema);
+module.exports = Meals;

@@ -1,61 +1,53 @@
 
 
-const express = require('express');
-const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+require("dotenv").config() // load .env variables
+const express = require("express") // import express
+const morgan = require("morgan") //import morgan
+const {log} = require("mercedlogger") // import mercedlogger's log function
+const cors = require("cors") // import cors
+const UserRouter = require("./controller/userController") //import User Routes
 
 
-// fileName : server.js 
+const {PORT = 3000} = process.env
+
 // Example using the http module
 const app = express();
-const router = express.Router();
 app.use(cors());
-app.use(express.json());
-
+app.use(morgan("tiny")) 
+app.use(express.json()) 
 
 
 // Making Routes
 app.get('/', (req, res) => {
-    res.send('<h1>Hello, Express.js Server!</h1>');
+    res.send('Express Server up and running!');
 });
 
-// Specify the port to listen on
-const port = process.env.PORT || 3000; 
+app.use("/user", UserRouter)
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
-const uri = "mongodb+srv://yaokuz:euYrCqua7mQtA0kH@clusterclientbuyer.uyo2s.mongodb.net/?retryWrites=true&w=majority&appName=ClusterClientBuyer";
-const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  });
 
-
-
-  async function run() {
+/*   async function run() {
     try {
       // Connect the client to the server	(optional starting in v4.7)
       await client.connect();
       // Send a ping to confirm a successful connection
       await client.db("admin").command({ ping: 1 });
-      console.log("Pinged your deployment. You successfully connected to MongoDB!");
+      console.log("Pinged your deployment. You successfully connected to Database!");
     } finally {
       // Ensures that the client will close when you finish/error
       await client.close();
     }
   }
-  run().catch(console.dir);
+  run().catch(console.dir); */
 
 // Include route files
-const usersRoute = require('./routes/api/usersRoute');
+/* const usersRoute = require('./routes/api/usersRoute');
 const foodRoute = require('./routes/api/foodRoute');
 
 // Use routes
 app.use('/users', usersRoute);
-app.use('/meals', foodRoute);
+app.use('/meals', foodRoute); */
