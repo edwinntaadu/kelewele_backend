@@ -48,5 +48,5 @@ const UserProfileSchema = new Schema({
 
 // UserProfile model
 const UserProfile = model("User_profile", UserProfileSchema)
-
+ 
 module.exports = UserProfile

@@ -1,6 +1,6 @@
 require("dotenv").config(); 
 const { Router } = require("express"); 
-const User = require("../models/user_auth"); 
+const {User, Verification} = require("../models/user_auth"); 
 const UserProfile = require("../models/user_profile")
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken"); 
@@ -24,7 +24,7 @@ router.post("/signup", async (req, res) => {
       "email":user.email,
       "username":user.username,
       "userID":user.id,
-      "phoneNumber":"+49234553221"
+      "phoneNumber":"+4923455328761"
     });
 
     res.json({ user, userProfile });

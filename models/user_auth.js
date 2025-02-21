@@ -1,4 +1,4 @@
-const {Schema, model} = require("../conn/connection") 
+const {Schema, model} = require("../conn/connection")
 
 // User Schema
 const UserSchema = new Schema({
@@ -19,4 +19,4 @@ const VerificationSchema = new Schema({
 const User = model("User", UserSchema)
 const Verification = model("verification", VerificationSchema)
 
-module.exports = { User, Verification }
+module.exports =  {User, Verification}
