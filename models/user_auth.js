@@ -17,6 +17,6 @@ const VerificationSchema = new Schema({
 
 // User model
 const User = model("User", UserSchema)
-const Verification = model("verification", VerificationSchema)
+const Verification = model("user_verification", VerificationSchema)
 
 module.exports =  {User, Verification}
