@@ -1,5 +1,3 @@
-
-
 require("dotenv").config() // load .env variables
 const express = require("express") // import express
 const morgan = require("morgan") //import morgan
@@ -19,14 +17,14 @@ app.use(express.json())
 
 // Making Routes
 app.get('/', (req, res) => {
-    res.send('Express Server up and running!');
+    res.send('Express Server up and running...!');
 });
 
 app.use("/user", UserRouter)
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running... on port ${PORT}`);
 });
 
 
