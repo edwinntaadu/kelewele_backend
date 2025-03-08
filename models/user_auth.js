@@ -2,10 +2,18 @@ const {Schema, model} = require("../conn/connection")
 
 // User Schema
 const UserSchema = new Schema({
+    googleId: { type: String, unique: true, sparse: true },
+    facebookId: { type: String, unique: true, sparse: true },
+    email: { type: String, unique: true, required: true },
+    username: { type: String },
+    password: { type: String } // Optional for non-OAuth users
+});
+
+/* const UserSchema = new Schema({
     email: {type: String, unique: true, required: true},
     username: {type: String},
     password: {type: String, required: true}
-})
+})*/
 
 //
 const VerificationSchema = new Schema({
