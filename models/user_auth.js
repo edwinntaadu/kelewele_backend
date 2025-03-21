@@ -14,9 +14,22 @@ const VerificationSchema = new Schema({
     createdAt: { type: Date, default: Date.now, expires: 300 }, // Code expires after 5 minutes
 });
 
+const Email_verificationSchema_passReset = new Schema({
+    email: { type: String, required: true },
+    code: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now, expires: 300 }, // Code expires after 5 minutes
+});
+const Phone_verificationSchema_passReset = new Schema({
+    phone: { type: String, required: true },
+    code: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now, expires: 300 }, // Code expires after 5 minutes
+});
+
 
 // User model
 const User = model("User", UserSchema)
+const EmailPassReset = model("email_verification_passReset", UserSchema)
+const PhonePassReset = model("phone_verification_passReset", UserSchema)
 const Verification = model("user_verification", VerificationSchema)
 
-module.exports =  {User, Verification}
+module.exports =  {User, Verification, EmailPassReset, PhonePassReset}

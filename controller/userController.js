@@ -1,10 +1,11 @@
 require("dotenv").config(); 
 const { Router } = require("express"); 
-const {User, Verification} = require("../models/user_auth"); 
+const {User, Verification, EmailPassReset, PhonePassReset} = require("../models/user_auth"); 
 const UserProfile = require("../models/user_profile")
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken"); 
 const twilio = require('twilio');
+const nodemailer = require('nodemailer');
 
 
 const router = Router();
@@ -64,6 +65,32 @@ const generateVerificationCode = () => Math.floor(1000 + Math.random() * 9000).t
 // Twilio Client
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
+// Nodemailer Transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Function to send email
+async function sendEmail(to, subject, text) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: to,
+    subject: subject,
+    text: text
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+}
+
 // Route: Send Verification Code
 router.post('/send-code_to_phone', async (req, res) => {
   const { phone } = req.body;
@@ -113,6 +140,51 @@ router.post('/verify-code', async (req, res) => {
     res.status(500).json({ error: 'Verification failed' });
   }
 });
+
+router.post("/email_verification_reset-password", async (req, res) => {
+
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+
+  try {
+    const code = generateVerificationCode();
+    // Save to DB
+    await PasswordResetVerification.create({ email, code });
+
+    // Send Email
+    //await sendEmail(email, 'Password Reset Verification Code', `Your verification code is: ${code}`);
+
+    res.status(200).json({ message: `Verification code sent successfully ${code}`, code: 100 });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to send verification code' });
+  }
+});
+
+router.post("/phone_verification_reset-password", async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: 'Phone number is required' });
+
+  try {
+    const code = generateVerificationCode();
+    // Save to DB
+    await PasswordResetVerification.create({ email: phone, code });
+
+    // Send SMS
+    // await twilioClient.messages.create({
+    //   body: `Your verification code is: ${code}`,
+    //   from: process.env.TWILIO_PHONE_NUMBER,
+    //   to: phone,
+    // });
+
+    alert (`Your verification code is: ${code}`) ;
+
+    res.status(200).json({ message: `Verification code sent successfully ${code}`, code: 100 });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to send verification code' });
+  }
+});
+
+
 
 
 //Feth Profile Information
