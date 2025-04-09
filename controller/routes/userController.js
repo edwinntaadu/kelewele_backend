@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
-
+ 22
     // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
@@ -119,32 +119,29 @@ router.post('/send-code_to_phone', async (req, res) => {
 });
 
 // Route: Verify Code
-router.post('/verify-code', async (req, res) => {
-  const { phone, code, id } = req.body;
-  if (!phone || !code) return res.status(400).json({ error: 'Phone number and code are required' });
-
+router.post("/verify-code", async (req, res) => {
   try {
+      const { phone, code, id } = req.body;
 
-    console.log("Record found: ", record) 
+      // Declare and initialize `record` before using it
+      const record = await Verification.findOne({ phone, code, id });
 
-    const record = await Verification.findOne({ phone:phone, code: code });
-    console.log(JSON.stringify(record))
-    
-    if (!record) return res.status(400).json({ error: 'Invalid code or phone number' });
+      if (!record) {
+          return res.status(400).json({ message: "Verification failed. Invalid code or phone number." });
+      }
 
-    //Make entry into User Profile
-    const result = await UserProfile.updateOne(
-      { _id: id }, 
-      { $set: { phoneNumber: phone } });
+      if (record.isVerified) {
+          return res.status(400).json({ message: "Phone number is already verified." });
+      }
 
-      const res = await result.json();
-      console.log("Updated"+JSON.stringify(res))
-    
-    //Verification successful, you can delete the record
-    //await Verification.deleteOne({ _id: record._id });
-    res.status(200).json({ message: 'Phone number verified successfully', code: 100 });
-  } catch (err) {
-    res.status(500).json({ error: 'Verification failed'+err });
+      // Mark the record as verified
+      record.isVerified = true;
+      await record.save();
+      return res.status(200).json({ message: "Phone number verified successfully", code: 100 });
+
+  } catch (error) {
+      console.error("Error during verification:", error);
+      return res.status(500).json({ message: "An error occurred during verification." });
   }
 });
 
