@@ -1,34 +1,31 @@
 require("dotenv").config(); // loading env variables
 const jwt = require("jsonwebtoken");
+const  SECRET_KEY  = process.env.SECRET_KEY;
 
 // MIDDLEWARE FOR AUTHORIZATION (MAKING SURE THEY ARE LOGGED IN)
-const isLoggedIn = async (req, res, next) => {
-  try {
-    // check if auth header exists
-    if (req.headers.authorization) {
-      // parse token from header
-      const token = req.headers.authorization.split(" ")[1]; //split the header and get the token
-      if (token) {
-        const payload = await jwt.verify(token, process.env.SECRET);
-        if (payload) {
-          // store user data in request object
-          req.user = payload;
-          next();
-        } else {
-          res.status(400).json({ error: "token verification failed" });
-        }
-      } else {
-        res.status(400).json({ error: "malformed auth header" });
-      }
-    } else {
-      res.status(400).json({ error: "No authorization header" });
-    }
-  } catch (error) {
-    res.status(400).json({ error });
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    console.error("Authorization header is missing or invalid:", authHeader);
+    return res.status(401).json({ message: "Access token is missing or invalid" });
   }
+
+  const token = authHeader.split(" ")[1];
+  
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) {
+      console.error("Token verification error:", err); // Log the error
+      return res.status(403).json({ message: err.message});
+    }
+    console.log("Decoded token:", user); // Log the decoded token
+    req.user = user;
+    next();
+  }); 
 };
 
 // export custom middleware
 module.exports = {
-  isLoggedIn,
+  authenticateToken,
 };

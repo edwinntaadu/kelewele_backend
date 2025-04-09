@@ -5,7 +5,8 @@ const express = require("express") // import express
 const morgan = require("morgan") //import morgan
 const {log} = require("mercedlogger") // import mercedlogger's log function
 const cors = require("cors") // import cors
-const UserRouter = require("./controller/userController") //import User Routes
+const UserRouter = require("./controller/routes/userController") //import User Routes
+const ProfileRouter = require("./controller/routes/profileController") //import Profile Routes
 
 
 const {PORT = 3000} = process.env
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 });
 
 app.use("/user", UserRouter)
+app.use("/profile", ProfileRouter)
 
 // Start the server
 app.listen(PORT, () => {

@@ -1,7 +1,7 @@
 require("dotenv").config(); 
 const { Router } = require("express"); 
-const {User, Verification, EmailPassReset, PhonePassReset} = require("../models/user_auth"); 
-const UserProfile = require("../models/user_profile")
+const {User, Verification, EmailPassReset, PhonePassReset, Session} = require("../../models/user_auth"); 
+const UserProfile = require("../../models/user_profile")
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken"); 
 const twilio = require('twilio');
@@ -10,7 +10,8 @@ const nodemailer = require('nodemailer');
 
 const router = Router();
 
-const { SECRET = "secret" } = process.env;
+const SECRET_KEY  = process.env.SECRET_KEY;
+
 
 // Signup route to create a new user
 router.post("/signup", async (req, res) => {
@@ -38,21 +39,24 @@ router.post("/signup", async (req, res) => {
 // Login route to verify a user and get a token
 router.post("/login", async (req, res) => {
   try {
-    // check if the user exists
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      //check if password matches
-      const result = await bcrypt.compare(req.body.password, user.password);
-      if (result) {
-        // sign token and send it in response
-        const token = await jwt.sign({ email: user.email }, SECRET);
-        res.json({ token });
-      } else {
-        res.status(400).json({ error: "password doesn't match" });
-      }
-    } else {
-      res.status(400).json({ error: "User doesn't exist" });
-    }
+    const { email, password } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "1d" });
+
+    console.log("Generated token:", SECRET_KEY); // Log the generated token
+    // Save session in DB
+    await Session.create({ userId: user._id, token });
+
+    res.json({ token });
   } catch (error) {
     res.status(400).json({ error });
   }
@@ -120,8 +124,12 @@ router.post('/verify-code', async (req, res) => {
   if (!phone || !code) return res.status(400).json({ error: 'Phone number and code are required' });
 
   try {
+
+    console.log("Record found: ", record) 
+
     const record = await Verification.findOne({ phone:phone, code: code });
     console.log(JSON.stringify(record))
+    
     if (!record) return res.status(400).json({ error: 'Invalid code or phone number' });
 
     //Make entry into User Profile
@@ -133,11 +141,10 @@ router.post('/verify-code', async (req, res) => {
       console.log("Updated"+JSON.stringify(res))
     
     //Verification successful, you can delete the record
-    await Verification.deleteOne({ _id: record._id });
-
-    res.status(200).json({ message: 'Phone number verified successfully' });
+    //await Verification.deleteOne({ _id: record._id });
+    res.status(200).json({ message: 'Phone number verified successfully', code: 100 });
   } catch (err) {
-    res.status(500).json({ error: 'Verification failed' });
+    res.status(500).json({ error: 'Verification failed'+err });
   }
 });
 
@@ -183,6 +190,22 @@ router.post("/phone_verification_reset-password", async (req, res) => {
     res.status(500).json({ error: 'Failed to send verification code' });
   }
 });
+
+
+router.post("/logout", async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ message: "No token provided" });
+
+    // Delete session from DB
+    await Session.deleteOne({ token });
+
+    res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
 
 
 
