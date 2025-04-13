@@ -40,19 +40,18 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
- 22
+ 
     // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "1d" });
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
 
-    console.log("Generated token:", SECRET_KEY); // Log the generated token
+    console.log("Generated token:", process.env.SECRET_KEY); // Log the generated token
     // Save session in DB
     await Session.create({ userId: user._id, token });
 
@@ -173,13 +172,6 @@ router.post("/phone_verification_reset-password", async (req, res) => {
     // Save to DB
     await PasswordResetVerification.create({ email: phone, code });
 
-    // Send SMS
-    // await twilioClient.messages.create({
-    //   body: `Your verification code is: ${code}`,
-    //   from: process.env.TWILIO_PHONE_NUMBER,
-    //   to: phone,
-    // });
-
     alert (`Your verification code is: ${code}`) ;
 
     res.status(200).json({ message: `Verification code sent successfully ${code}`, code: 100 });
@@ -202,12 +194,6 @@ router.post("/logout", async (req, res) => {
     res.status(500).json({ error });
   }
 });
-
-
-
-
-
-//Feth Profile Information
 
 
 module.exports = router
