@@ -17,7 +17,14 @@ const MealSchema = new Schema({
     imageUrl: { type: String, required: false }, // URL to the meal's image
     preparationTime: { type: Number, required: true }, // Preparation time in minutes
     calories: { type: Number, required: false }, // Optional calorie count
-    tags: [{ type: String }] // e.g., ["Spicy", "Vegetarian"]
+    tags: [{ type: String }], // e.g., ["Spicy", "Vegetarian"]
+    sellerType: { 
+        type: String, 
+        enum: ["Private", "Restaurant"], // Allowed values
+        required: true // Make this field mandatory
+    },
+    sellerName: { type: String, required: true }, // Name of the seller
+    sellerId: { type: Schema.Types.ObjectId, ref: "Seller", required: true } // Reference to the seller's ID
 });
 
 module.exports = mongoose.model('MealSchema', MealSchema);
