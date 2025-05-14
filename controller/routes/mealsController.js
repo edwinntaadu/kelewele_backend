@@ -3,17 +3,19 @@ const authMiddleware = require("../middleware");
 
 require("dotenv").config(); 
 const {User, Verification, EmailPassReset, PhonePassReset, Session} = require("../../models/user_auth"); 
-const UserProfile = require("../../models/mealData")
+const Meals = require("../../models/mealData")
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken"); 
 const twilio = require('twilio');
 const nodemailer = require('nodemailer');
 
+ // Import the populateMeals model
+
 const router = Router();
 
 const authenticateToken = require("../middleware").authenticateToken; // Import the middleware
 
-router.get("/meals", async (req, res) => {
+router.get("/meals_all", async (req, res) => {
     try {
         const meals = await Meals.find();
         res.status(200).json(meals);
@@ -79,11 +81,15 @@ router.delete("/meals/:id", authenticateToken, async (req, res) => {
     }
 });
 
-router.get("/meals/search", async (req, res) => {
+router.get("/something", async (req, res) => {
+    console.log("Search query2222:", req.query); // Log the search query
     try {
+
+        const { query } = req.query;
+        console.log("Search query:", query); // Log the search query
         const { keyword, category, sellerType, minPrice, maxPrice } = req.query;
 
-        const query = {};
+        //const query = {};
         if (keyword) query.name = { $regex: keyword, $options: "i" };
         if (category) query.category = category;
         if (sellerType) query.sellerType = sellerType;
@@ -105,6 +111,57 @@ router.get("/meals/seller/:sellerId", async (req, res) => {
     } catch (error) {
         console.error("Error fetching meals by seller:", error);
         res.status(500).json({ message: "Failed to fetch meals by seller" });
+    }
+});
+
+// Search meals by keyword
+router.get("/search", async (req, res) => {
+    //Working Query: http://localhost:5000/meals/search?query=chicken
+    try {
+        const { query } = req.query;
+
+        if (!query) {
+            return res.status(400).json({ message: "Query is required" });
+        }
+
+        // Use regex to search for the keyword in multiple fields
+        const meals = await Meals.find({
+            $or: [
+                { name: { $regex: query, $options: "i" } }, // Search in food name
+                { "ingredients.name": { $regex: query, $options: "i" } }, // Search in ingredient names
+                { description: { $regex: query, $options: "i" } }, // Search in description
+                { tags: { $elemMatch: { $regex: query, $options: "i" } } } // Corrected: Search in tags (array of strings)
+            ]
+        });
+
+        if (meals.length === 0) {
+            //return res.status(404).json({ message: "No meals found matching the keyword" });
+        }
+
+        res.status(200).json(meals);
+    } catch (error) {
+        console.error("Error searching meals:", error);
+        res.status(500).json({ message: "Failed to search meals" });
+    }
+});
+
+//Router to populate meals with meal data
+router.get("/populate-meals", async (req, res) => {
+    console.log("Meals population router reached")
+    try {
+        //const meals = await Meals.find().populate("mealData");
+        populateMeals()
+            .then((meals) => {
+                res.status(200).json(meals);
+            })
+            .catch((error) => {
+                console.error("Error populating meals:", error);
+                res.status(500).json({ message: "Failed to populate meals" });
+            });
+        res.status(200).json(meals);
+    } catch (error) {
+        console.error("Error populating meals:", error);
+        res.status(500).json({ message: "Failed to populate meals" });
     }
 });
 

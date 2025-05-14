@@ -7,7 +7,8 @@ const {log} = require("mercedlogger") // import mercedlogger's log function
 const cors = require("cors") // import cors
 const UserRouter = require("./controller/routes/userController") //import User Routes
 const ProfileRouter = require("./controller/routes/profileController") //import Profile Routes
-
+const MealsRouter = require("./controller/routes/mealsController") //import Meals Routes
+const SellersRouter = require("./controller/routes/sellersController") //import Sellers Routes
 
 const {PORT = 3000} = process.env
 
@@ -25,6 +26,8 @@ app.get('/', (req, res) => {
 
 app.use("/user", UserRouter)
 app.use("/profile", ProfileRouter)
+app.use("/meals", MealsRouter)
+app.use("/sellers", SellersRouter)
 
 // Start the server
 app.listen(PORT, () => {

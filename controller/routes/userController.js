@@ -6,6 +6,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken"); 
 const twilio = require('twilio');
 const nodemailer = require('nodemailer');
+//const { populateSellers } = require("./helper_function/populate_sellers");
+
+
 
 
 const router = Router();
@@ -38,6 +41,8 @@ router.post("/signup", async (req, res) => {
 
 // Login route to verify a user and get a token
 router.post("/login", async (req, res) => {
+
+
   try {
     const { email, password } = req.body;
     // Check if user exists
@@ -50,6 +55,8 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+
+
 
     console.log("Generated token:", process.env.SECRET_KEY); // Log the generated token
     // Save session in DB

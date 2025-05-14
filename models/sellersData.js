@@ -28,10 +28,9 @@ const SellerSchema = new Schema({
     },
     createdAt: { type: Date, default: Date.now }, // Timestamp for when the seller was created
     updatedAt: { type: Date, default: Date.now } // Timestamp for when the seller was last updated
-});
+},
+{ collection: 'sellers_information' });
 
 
-module.exports = mongoose.model("Sellers", SellerSchema);
-
-const Sellers = model("Sellers", SellerSchema);
+const Sellers = model("sellers_information", SellerSchema);
 module.exports = Sellers;

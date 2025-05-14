@@ -25,9 +25,9 @@ const MealSchema = new Schema({
     },
     sellerName: { type: String, required: true }, // Name of the seller
     sellerId: { type: Schema.Types.ObjectId, ref: "Seller", required: true } // Reference to the seller's ID
-});
+},
+{ collection: 'meals_data' });
 
-module.exports = mongoose.model('MealSchema', MealSchema);
 
-const Meals = model('mealsData', MealSchema);
+const Meals = model('meals_Data', MealSchema);
 module.exports = Meals;
