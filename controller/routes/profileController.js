@@ -8,7 +8,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken"); 
 const twilio = require('twilio');
 const nodemailer = require('nodemailer');
-
+//import { populateSellers } from "./helper_function/populate_sellers"; // Import the populateSellers function
+//const { populateMeals } = require("./helper_function/populate_meals"); // Import the populateMeals function
 const router = Router();
 
 const authenticateToken = require("../middleware").authenticateToken; // Import the middleware
@@ -23,6 +24,9 @@ router.get("/getProfileInformation", authenticateToken, async (req, res) => {
         if (!userProfile.email) {
           return res.status(404).json({ message: "User profile not found" });
         }
+
+       //await populateMeals(); // Call the populateSellers function with userProfile
+        //populateMeals(); // Call the populateMeals function with userProfile
     
         res.status(200).json({ profile: userProfile }); 
       } catch (error) {

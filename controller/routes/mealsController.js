@@ -165,4 +165,17 @@ router.get("/populate-meals", async (req, res) => {
     }
 });
 
+//Router to populate meals with meal data
+router.get("/getRankingMeals", async (req, res) => {
+    
+    try {
+        const meals = await Meals.find().sort({ general_rating: -1 }).limit(10); // Get top 10 meals by general rating
+        res.status(200).json(meals);    
+        
+    } catch (error) {
+        console.error("Error getting ranking meals:", error);
+        res.status(500).json({ message: "failed to get ranking meals" });
+    }
+});
+
 module.exports = router;

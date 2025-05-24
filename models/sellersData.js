@@ -9,12 +9,14 @@ const SellerSchema = new Schema({
         enum: ["Private", "Business"], // Allowed values
         required: true // Indicates if the seller is private or a business
     },
-    rating: { 
+    general_rating: { 
         type: Number, 
         default: 0, // Default rating
         min: 0, 
         max: 5 // Rating range from 0 to 5
     },
+    health_rating: { type: Number, required: false }, // health rating
+    trend_rating: { type: Number, required: false }, // trend rating
     profileId: { 
         type: Schema.Types.ObjectId, 
         ref: "UserProfile", // Reference to the actual profile information

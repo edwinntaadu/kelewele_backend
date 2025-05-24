@@ -6,7 +6,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken"); 
 const twilio = require('twilio');
 const nodemailer = require('nodemailer');
-//const { populateSellers } = require("./helper_function/populate_sellers");
 
 
 
@@ -189,6 +188,7 @@ router.post("/phone_verification_reset-password", async (req, res) => {
 
 
 router.post("/logout", async (req, res) => {
+  console.log("Logout request received:"); // Log the request body
   try {
     const { token } = req.body;
     if (!token) return res.status(400).json({ message: "No token provided" });

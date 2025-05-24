@@ -17,10 +17,13 @@ const MealSchema = new Schema({
     imageUrl: { type: String, required: false }, // URL to the meal's image
     preparationTime: { type: Number, required: true }, // Preparation time in minutes
     calories: { type: Number, required: false }, // Optional calorie count
+    general_rating: { type: Number, required: false }, // marketplace rating
+    health_rating: { type: Number, required: false }, // health rating
+    trend_rating: { type: Number, required: false }, // trend rating
     tags: [{ type: String }], // e.g., ["Spicy", "Vegetarian"]
     sellerType: { 
         type: String, 
-        enum: ["Private", "Restaurant"], // Allowed values
+        enum: ["Private", "Business"], // Allowed values
         required: true // Make this field mandatory
     },
     sellerName: { type: String, required: true }, // Name of the seller
